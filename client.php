@@ -14,16 +14,25 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="socket.min.js"></script>
 <script>
-var socket = io.connect("ws://127.0.0.1:2021");
+    var socket = io.connect("http://localhost:2021");
 
-$('.message').on('change', function() {
-    socket.emit('send message', $(this).val());
-    $(this).val('');
-});
+    socket.on('connect', () => {
 
-socket.on('new message', function(data) {
-    $('#chat-messages').append('<p>' + data + '</p>');
-});
+        // clear send buffer to avoid reemiting events after lost of connection
+        socket.sendBuffer = []
+
+        console.log('CONNECTED')
+    })
+
+    $('.message').on('change', function() {
+        socket.emit('send message', $(this).val());
+        $(this).val('');
+    });
+
+    socket.on('new message', function(data) {
+        $('#chat-messages').append('<p>' + data + '</p>');
+        console.log("DATA RECEIVED: ", data)
+    });
 </script>
 
 </html>
